@@ -1,0 +1,45 @@
+{
+  "name": "define-service",
+  "version": "0.1.0",
+  "description": "Define and manage native OS services for Bun, Node.js, and standalone executables with a tiny object-style API.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "keywords": [
+    "service",
+    "daemon",
+    "systemd",
+    "launchd",
+    "windows",
+    "startup",
+    "autostart",
+    "bun",
+    "node"
+  ],
+  "scripts": {
+    "build": "bun run scripts/build.ts",
+    "check": "bunx tsc --noEmit",
+    "pretest": "bun run build",
+    "test": "bun test",
+    "test:unit": "bun test test/unit",
+    "test:e2e": "bun test test/e2e"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.10",
+    "typescript": "^5.8.2"
+  }
+}
