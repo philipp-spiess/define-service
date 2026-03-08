@@ -1,21 +1,22 @@
+import { mkdir, rename, rm } from "node:fs/promises";
+
 const root = new URL("..", import.meta.url);
-const distDir = new URL("../dist/", import.meta.url);
 
-await Bun.$`rm -rf ${distDir.pathname}`;
+await rm(new URL("../dist/", import.meta.url), { recursive: true, force: true });
+await rm(new URL("../src/index.js", import.meta.url), { force: true });
+await rm(new URL("../src/index.js.map", import.meta.url), { force: true });
+await rm(new URL("../src/index.cjs", import.meta.url), { force: true });
+await rm(new URL("../src/index.cjs.map", import.meta.url), { force: true });
 
-for (const format of ["esm", "cjs"] as const) {
-  const outfile = new URL(
-    format === "esm" ? "../dist/index.js" : "../dist/index.cjs",
-    import.meta.url,
-  );
-
+for (const [format, outdir, outfile] of [
+  ["esm", "./dist/esm", "./dist/index.js"],
+  ["cjs", "./dist/cjs", "./dist/index.cjs"],
+] as const) {
   const result = await Bun.build({
-    entrypoints: [new URL("../src/index.ts", import.meta.url).pathname],
-    outdir: distDir.pathname,
-    outfile: outfile.pathname,
+    entrypoints: ["./src/index.ts"],
+    outdir,
     target: "node",
     format,
-    minify: false,
     sourcemap: "linked",
     packages: "bundle",
   });
@@ -26,18 +27,24 @@ for (const format of ["esm", "cjs"] as const) {
     }
     process.exit(1);
   }
+
+  await mkdir(new URL("../dist/", import.meta.url), { recursive: true });
+  await rename(new URL(`../${outdir}/index.js`, import.meta.url), new URL(`../${outfile}`, import.meta.url));
+  await rename(
+    new URL(`../${outdir}/index.js.map`, import.meta.url),
+    new URL(`../${outfile}.map`, import.meta.url),
+  );
 }
+
+await rm(new URL("../dist/esm", import.meta.url), { recursive: true, force: true });
+await rm(new URL("../dist/cjs", import.meta.url), { recursive: true, force: true });
 
 const types = Bun.spawnSync(
   [
     Bun.which("bunx") ?? "bunx",
     "tsc",
     "--project",
-    new URL("../tsconfig.json", import.meta.url).pathname,
-    "--declaration",
-    "--emitDeclarationOnly",
-    "--outDir",
-    new URL("../dist", import.meta.url).pathname,
+    "./tsconfig.build.json",
   ],
   {
     cwd: root.pathname,
