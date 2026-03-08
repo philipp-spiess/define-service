@@ -1,6 +1,7 @@
 import { mkdir, rename, rm } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 
-const root = new URL("..", import.meta.url);
+const root = fileURLToPath(new URL("..", import.meta.url));
 
 await rm(new URL("../dist/", import.meta.url), { recursive: true, force: true });
 await rm(new URL("../src/index.js", import.meta.url), { force: true });
@@ -41,13 +42,14 @@ await rm(new URL("../dist/cjs", import.meta.url), { recursive: true, force: true
 
 const types = Bun.spawnSync(
   [
-    Bun.which("bunx") ?? "bunx",
+    process.execPath,
+    "x",
     "tsc",
     "--project",
     "./tsconfig.build.json",
   ],
   {
-    cwd: root.pathname,
+    cwd: root,
     stdout: "inherit",
     stderr: "inherit",
   },
