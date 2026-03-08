@@ -1,7 +1,7 @@
 {
   "name": "define-service",
   "version": "0.1.0",
-  "description": "Define and manage native OS services for Bun, Node.js, and standalone executables with a tiny object-style API.",
+  "description": "Define, install, and control native OS services across systemd, launchd, and Windows Task Scheduler with a tiny object-style API.",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -25,10 +25,13 @@
     "systemd",
     "launchd",
     "windows",
+    "task-scheduler",
     "startup",
     "autostart",
     "bun",
-    "node"
+    "node",
+    "service-manager",
+    "launchagent"
   ],
   "scripts": {
     "build": "bun run scripts/build.ts",
