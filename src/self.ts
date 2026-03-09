@@ -1,3 +1,4 @@
+import { basename } from "node:path";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
@@ -7,6 +8,10 @@ export function self(...args: string[]): [string, ...string[]] {
     const main = Bun.main;
 
     if (isCompiledBunMain(main)) {
+      return [process.execPath, ...args];
+    }
+
+    if (!looksLikeBunCli(process.execPath) && !looksLikeBunCli(process.argv0)) {
       return [process.execPath, ...args];
     }
 
@@ -46,4 +51,13 @@ function normalizePathForComparison(path: string): string {
   const normalized = path.replaceAll("\\", "/");
 
   return process.platform === "win32" ? normalized.toLowerCase() : normalized;
+}
+
+function looksLikeBunCli(path: string | undefined): boolean {
+  if (!path) {
+    return false;
+  }
+
+  const name = basename(path).toLowerCase();
+  return name === "bun" || name === "bun.exe";
 }
