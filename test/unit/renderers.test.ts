@@ -1,21 +1,23 @@
 import { describe, expect, test } from "bun:test";
 
-import { normalizeServiceOptions } from "../../src/internal";
+import type { ResolvedServiceOptions } from "../../src/internal";
 import { renderSystemdUnit } from "../../src/linux";
 import { renderLaunchdPlist } from "../../src/macos";
 import { renderWindowsWrapper } from "../../src/windows";
 
-const definition = normalizeServiceOptions({
+const definition: ResolvedServiceOptions = {
   name: "acme-agent",
   description: "Background sync agent",
-  run: ["/opt/acme/agent", "serve", "--foreground"],
+  command: "/opt/acme/agent",
+  args: ["serve", "--foreground"],
   cwd: "/opt/acme",
   env: {
     ACME_TOKEN: "secret",
   },
   boot: true,
   restart: "on-failure",
-});
+  scope: "user",
+};
 
 describe("platform renderers", () => {
   test("renders a systemd unit", () => {

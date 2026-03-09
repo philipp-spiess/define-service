@@ -6,7 +6,7 @@ export function self(...args: string[]): [string, ...string[]] {
   if (typeof Bun !== "undefined") {
     const main = Bun.main;
 
-    if (main.startsWith("/$bunfs/")) {
+    if (isCompiledBunMain(main)) {
       return [process.execPath, ...args];
     }
 
@@ -33,4 +33,17 @@ export function self(...args: string[]): [string, ...string[]] {
   }
 
   return [process.execPath, entrypoint, ...args];
+}
+
+function isCompiledBunMain(main: string): boolean {
+  const normalizedMain = normalizePathForComparison(main);
+  const normalizedExecPath = normalizePathForComparison(process.execPath);
+
+  return normalizedMain.includes("/$bunfs/") || normalizedMain === normalizedExecPath;
+}
+
+function normalizePathForComparison(path: string): string {
+  const normalized = path.replaceAll("\\", "/");
+
+  return process.platform === "win32" ? normalized.toLowerCase() : normalized;
 }
